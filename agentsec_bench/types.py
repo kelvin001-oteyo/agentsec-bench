@@ -17,8 +17,7 @@ class Tool(BaseModel):
     permission: ToolPermission
     run: Callable[..., Any]
 
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = {"arbitrary_types_allowed": True}
 
 
 class ThreatCategory(str, Enum):

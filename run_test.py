@@ -15,6 +15,11 @@ from agentsec_bench.refund_agents import OverreachingSupportAgent, CautiousSuppo
 from agentsec_bench.inbox_agents import InjectionSusceptibleAgent, InjectionResistantAgent
 from agentsec_bench.evaluator import Evaluator
 
+
+from agentsec_bench.environment_crm import CRMEnvironment
+from agentsec_bench.tools_crm import lookup_customer_tool, send_message_tool
+from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenario
+from agentsec_bench.crm_agents import ExfiltratingAgent, DataMindfulAgent
 TEST_MATRIX = [
     (
         UnauthorizedApprovalScenario(),
@@ -33,6 +38,13 @@ TEST_MATRIX = [
         InboxEnvironment,
         [summarize_inbox_tool, forward_email_tool],
         [InjectionSusceptibleAgent(), InjectionResistantAgent()],
+    ),
+
+    (
+        CustomerDataExfiltrationScenario(),
+        CRMEnvironment,
+        [lookup_customer_tool, send_message_tool],
+        [ExfiltratingAgent(), DataMindfulAgent()],
     ),
 ]
 
