@@ -12,11 +12,15 @@ from agentsec_bench.environment_crm import CRMEnvironment
 from agentsec_bench.tools_crm import lookup_customer_tool, send_message_tool
 from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenario
 
+from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
+from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
+
 CHECKS = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
     (InboxInjectionScenario(), InboxEnvironment, [summarize_inbox_tool, forward_email_tool]),
     (CustomerDataExfiltrationScenario(), CRMEnvironment, [lookup_customer_tool, send_message_tool]),
+    (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
 ]
 
 all_passed = True

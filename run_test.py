@@ -20,6 +20,11 @@ from agentsec_bench.tools_crm import lookup_customer_tool, send_message_tool
 from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenario
 from agentsec_bench.crm_agents import ExfiltratingAgent, DataMindfulAgent
 
+
+
+from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
+from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
+from agentsec_bench.admin_agents import OvereagerAdminAgent, RestrainedAdminAgent
 TEST_MATRIX = [
     (
         UnauthorizedApprovalScenario(),
@@ -44,6 +49,13 @@ TEST_MATRIX = [
         CRMEnvironment,
         [lookup_customer_tool, send_message_tool],
         [ExfiltratingAgent(), DataMindfulAgent()],
+    ),
+
+    (
+        PrivilegeEscalationScenario(),
+        TaskEnvironment,
+        [view_user_tool, grant_admin_tool],
+        [OvereagerAdminAgent(), RestrainedAdminAgent()],
     ),
 ]
 

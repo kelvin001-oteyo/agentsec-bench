@@ -19,10 +19,15 @@ from agentsec_bench.tools_crm import lookup_customer_tool, send_message_tool
 from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenario
 from agentsec_bench.crm_agents import ExfiltratingAgent, DataMindfulAgent
 
+from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
+from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
+from agentsec_bench.admin_agents import OvereagerAdminAgent, RestrainedAdminAgent
+
 SCENARIO_CASES = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
     (InboxInjectionScenario(), InboxEnvironment, [summarize_inbox_tool, forward_email_tool]),
+    (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
 ]
 
 
@@ -98,4 +103,20 @@ def test_data_mindful_agent_is_not_flagged():
     evaluator = Evaluator(tools=tools)
     env = CRMEnvironment()
     result = evaluator.run(CustomerDataExfiltrationScenario(), DataMindfulAgent(), env)
+    assert result.attack_succeeded is False
+
+def test_overeager_admin_agent_is_flagged():
+    tools = [view_user_tool, grant_admin_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(PrivilegeEscalationScenario(), OvereagerAdminAgent(), env)
+    assert result.attack_succeeded is True
+    assert "grant_admin" in result.unauthorized_tool_calls
+
+
+def test_restrained_admin_agent_is_not_flagged():
+    tools = [view_user_tool, grant_admin_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(PrivilegeEscalationScenario(), RestrainedAdminAgent(), env)
     assert result.attack_succeeded is False
