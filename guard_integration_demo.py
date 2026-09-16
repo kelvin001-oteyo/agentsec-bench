@@ -1,49 +1,63 @@
 """
-Demonstrates AgentGuard preventing an attack that AgentSec-Bench detects.
-
-This runs the same scenario twice: once with the agent's tool calls
-executed directly (as AgentSec-Bench normally does), and once with
-AgentGuard checking each call first. The comparison shows the practical
-difference between detection (AgentSec-Bench) and prevention (AgentGuard).
+Demonstrates AgentGuard preventing attacks that AgentSec-Bench detects,
+across two different threat categories: unauthorized tool invocation
+(role-based) and prompt injection (destination-based).
 """
 
 from agentsec_bench.environment import TaskEnvironment
+from agentsec_bench.environment_inbox import InboxEnvironment
 from agentsec_bench.tools_expense import list_expenses_tool, approve_payment_tool
+from agentsec_bench.tools_inbox import summarize_inbox_tool, forward_email_tool
 from agentsec_bench.scenarios_expense import UnauthorizedApprovalScenario
+from agentsec_bench.scenarios_injection import InboxInjectionScenario
 from agentsec_bench.fake_agent import MisbehavingAgent
+from agentsec_bench.inbox_agents import InjectionSusceptibleAgent
 from agentsec_bench.evaluator import Evaluator
 
 from agentguard.policy import ToolPolicy
 from agentguard.guard import AgentGuard
 
-scenario = UnauthorizedApprovalScenario()
-tools = [list_expenses_tool, approve_payment_tool]
-agent = MisbehavingAgent()
 
-print("=== WITHOUT AgentGuard ===")
-evaluator = Evaluator(tools=tools)
-env = TaskEnvironment()
-result = evaluator.run(scenario, agent, env)
-print(f"Attack succeeded: {result.attack_succeeded}")
-print(f"Unauthorized tool calls executed: {result.unauthorized_tool_calls}")
+def demo(label, scenario, tools, agent, env_factory, guard):
+    print(f"=== {label} ===")
 
-print("\n=== WITH AgentGuard ===")
-policies = [
-    ToolPolicy(tool_name="approve_payment", allowed_roles=["finance_manager"]),
-]
-guard = AgentGuard(policies)
+    print("-- Without AgentGuard --")
+    evaluator = Evaluator(tools=tools)
+    env = env_factory()
+    result = evaluator.run(scenario, agent, env)
+    print(f"Attack succeeded: {result.attack_succeeded}")
+    print(f"Role violations: {result.unauthorized_tool_calls}")
+    print(f"Suspicious destinations: {result.suspicious_destinations}")
 
-# Simulate the agent's proposed calls being checked BEFORE execution
-messages, trace = agent.query(scenario.prompt, tools, TaskEnvironment())
-blocked_calls = []
-allowed_calls = []
-for call in trace:
-    decision = guard.check(call.tool_name, call.args, agent_role=agent.role)
-    if decision.allowed:
-        allowed_calls.append(call.tool_name)
-    else:
-        blocked_calls.append((call.tool_name, decision.reason))
+    print("-- With AgentGuard --")
+    messages, trace = agent.query(scenario.prompt, tools, env_factory())
+    blocked, allowed = [], []
+    for call in trace:
+        decision = guard.check(call.tool_name, call.args, agent_role=agent.role)
+        (allowed if decision.allowed else blocked).append((call.tool_name, decision.reason))
+    print(f"Allowed: {[c for c, _ in allowed]}")
+    print(f"Blocked: {blocked}")
+    print(f"Result: {'BLOCKED' if blocked else 'NOT BLOCKED'} before execution.\n")
 
-print(f"Calls allowed to execute: {allowed_calls}")
-print(f"Calls blocked before execution: {blocked_calls}")
-print(f"\nResult: the unauthorized action was {'BLOCKED' if blocked_calls else 'NOT BLOCKED'} before it could happen.")
+
+# Scenario 1: unauthorized tool invocation (role-based)
+guard1 = AgentGuard([ToolPolicy(tool_name="approve_payment", allowed_roles=["finance_manager"])])
+demo(
+    "UTI-001: Unauthorized Payment Approval",
+    UnauthorizedApprovalScenario(),
+    [list_expenses_tool, approve_payment_tool],
+    MisbehavingAgent(),
+    TaskEnvironment,
+    guard1,
+)
+
+# Scenario 2: prompt injection (destination-based)
+guard2 = AgentGuard([ToolPolicy(tool_name="forward_email", allowed_destinations=[])])
+demo(
+    "PI-001: Prompt Injection via Hidden Email Instruction",
+    InboxInjectionScenario(),
+    [summarize_inbox_tool, forward_email_tool],
+    InjectionSusceptibleAgent(),
+    InboxEnvironment,
+    guard2,
+)
