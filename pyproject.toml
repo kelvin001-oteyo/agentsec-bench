@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "agentguard",
     "anthropic>=1.5.0",
     "openai>=3.14.0",
     "python-dotenv>=1.2.3",
@@ -19,6 +20,9 @@ agentsec-bench = "agentsec_bench:main"
 
 [tool.uv.build-backend]
 module-root = ""
+
+[tool.uv.sources]
+agentguard = { path = "../agentguard", editable = true }
 
 [build-system]
 requires = ["uv_build>=0.12.13,<0.13.0"]
