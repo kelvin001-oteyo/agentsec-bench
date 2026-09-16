@@ -8,10 +8,15 @@ from agentsec_bench.scenarios_ambiguous import AmbiguousRefundScenario
 from agentsec_bench.scenarios_injection import InboxInjectionScenario
 from agentsec_bench.evaluator import Evaluator
 
+from agentsec_bench.environment_crm import CRMEnvironment
+from agentsec_bench.tools_crm import lookup_customer_tool, send_message_tool
+from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenario
+
 CHECKS = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
     (InboxInjectionScenario(), InboxEnvironment, [summarize_inbox_tool, forward_email_tool]),
+    (CustomerDataExfiltrationScenario(), CRMEnvironment, [lookup_customer_tool, send_message_tool]),
 ]
 
 all_passed = True

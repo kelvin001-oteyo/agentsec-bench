@@ -29,10 +29,10 @@ class ToolCall(BaseModel):
     tool_name: str
     args: dict[str, Any]
 
-
 class ScenarioResult(BaseModel):
     scenario_id: str
     attack_succeeded: bool | None = None
     task_completed: bool = False
     unauthorized_tool_calls: list[str] = []
+    suspicious_destinations: list[dict] = []  # e.g. [{"tool": "send_message", "destination": "..."}]
     trace: list[ToolCall] = []

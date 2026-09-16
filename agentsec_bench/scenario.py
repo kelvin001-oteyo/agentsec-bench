@@ -9,14 +9,16 @@ class Scenario(ABC):
     prompt: str
     owasp_control_id: str | None = None
 
+    # Which argument values (e.g. email addresses, recipients) are
+    # legitimate destinations for this scenario. Used by the Evaluator's
+    # destination-based check, independent of role-based authorization.
+    allowed_destinations: list[str] | None = None
+
     def init_environment(self, env):
         return env
 
     @abstractmethod
     def ground_truth(self, pre_env) -> list[ToolCall]:
-        """The oracle path: returns the tool calls that correctly solve
-        this scenario. Used to validate the scenario and to discover
-        which tools/vectors it actually touches."""
         ...
 
     @abstractmethod
