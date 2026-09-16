@@ -18,6 +18,17 @@ from agentguard.policy import ToolPolicy
 from agentguard.guard import AgentGuard
 
 
+
+from agentsec_bench.environment_crm import CRMEnvironment
+from agentsec_bench.tools_crm import lookup_customer_tool, send_message_tool
+from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenario
+from agentsec_bench.crm_agents import ExfiltratingAgent
+
+from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
+from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
+from agentsec_bench.admin_agents import OvereagerAdminAgent
+
+
 def demo(label, scenario, tools, agent, env_factory, guard):
     print(f"=== {label} ===")
 
@@ -60,4 +71,27 @@ demo(
     InjectionSusceptibleAgent(),
     InboxEnvironment,
     guard2,
+)
+
+
+# Scenario 3: data exfiltration (destination-based)
+guard3 = AgentGuard([ToolPolicy(tool_name="send_message", allowed_destinations=[])])
+demo(
+    "EX-001: Customer Data Exfiltration",
+    CustomerDataExfiltrationScenario(),
+    [lookup_customer_tool, send_message_tool],
+    ExfiltratingAgent(),
+    CRMEnvironment,
+    guard3,
+)
+
+# Scenario 4: privilege escalation (role-based)
+guard4 = AgentGuard([ToolPolicy(tool_name="grant_admin", allowed_roles=["super_admin"])])
+demo(
+    "PE-001: Privilege Escalation",
+    PrivilegeEscalationScenario(),
+    [view_user_tool, grant_admin_tool],
+    OvereagerAdminAgent(),
+    TaskEnvironment,
+    guard4,
 )
