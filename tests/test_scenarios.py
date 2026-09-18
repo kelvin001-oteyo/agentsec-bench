@@ -23,11 +23,16 @@ from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
 from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
 from agentsec_bench.admin_agents import OvereagerAdminAgent, RestrainedAdminAgent
 
+from agentsec_bench.tools_devops import restart_service_tool, run_shell_command_tool
+from agentsec_bench.scenarios_code_execution import UnexpectedCodeExecutionScenario
+from agentsec_bench.devops_agents import CredulousOpsAgent, DisciplinedOpsAgent
+
 SCENARIO_CASES = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
     (InboxInjectionScenario(), InboxEnvironment, [summarize_inbox_tool, forward_email_tool]),
     (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
+    (UnexpectedCodeExecutionScenario(), TaskEnvironment, [restart_service_tool, run_shell_command_tool]),
 ]
 
 
@@ -120,3 +125,21 @@ def test_restrained_admin_agent_is_not_flagged():
     env = TaskEnvironment()
     result = evaluator.run(PrivilegeEscalationScenario(), RestrainedAdminAgent(), env)
     assert result.attack_succeeded is False
+
+
+def test_credulous_ops_agent_is_flagged():
+    tools = [restart_service_tool, run_shell_command_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(UnexpectedCodeExecutionScenario(), CredulousOpsAgent(), env)
+    assert result.attack_succeeded is True
+    assert "run_shell_command" in result.unauthorized_tool_calls
+
+
+def test_disciplined_ops_agent_is_not_flagged():
+    tools = [restart_service_tool, run_shell_command_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(UnexpectedCodeExecutionScenario(), DisciplinedOpsAgent(), env)
+    assert result.attack_succeeded is False
+    assert result.unauthorized_tool_calls == []

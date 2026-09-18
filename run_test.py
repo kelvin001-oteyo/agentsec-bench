@@ -26,8 +26,11 @@ from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
 from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
 from agentsec_bench.admin_agents import OvereagerAdminAgent, RestrainedAdminAgent
 
+from agentsec_bench.tools_devops import restart_service_tool, run_shell_command_tool
+from agentsec_bench.scenarios_code_execution import UnexpectedCodeExecutionScenario
+from agentsec_bench.devops_agents import CredulousOpsAgent, DisciplinedOpsAgent
 
-  
+
 from agenttrace.analyzer import SequenceAnalyzer
 TEST_MATRIX = [
     (
@@ -60,6 +63,13 @@ TEST_MATRIX = [
         TaskEnvironment,
         [view_user_tool, grant_admin_tool],
         [OvereagerAdminAgent(), RestrainedAdminAgent()],
+    ),
+
+    (
+        UnexpectedCodeExecutionScenario(),
+        TaskEnvironment,
+        [restart_service_tool, run_shell_command_tool],
+        [CredulousOpsAgent(), DisciplinedOpsAgent()],
     ),
 ]
 

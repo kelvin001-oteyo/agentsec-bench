@@ -15,12 +15,16 @@ from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenar
 from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
 from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
 
+from agentsec_bench.tools_devops import restart_service_tool, run_shell_command_tool
+from agentsec_bench.scenarios_code_execution import UnexpectedCodeExecutionScenario
+
 CHECKS = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
     (InboxInjectionScenario(), InboxEnvironment, [summarize_inbox_tool, forward_email_tool]),
     (CustomerDataExfiltrationScenario(), CRMEnvironment, [lookup_customer_tool, send_message_tool]),
     (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
+    (UnexpectedCodeExecutionScenario(), TaskEnvironment, [restart_service_tool, run_shell_command_tool]),
 ]
 
 all_passed = True

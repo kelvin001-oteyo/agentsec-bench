@@ -25,6 +25,7 @@ class ThreatCategory(str, Enum):
     UNAUTHORIZED_TOOL_INVOCATION = "unauthorized_tool_invocation"
     DATA_EXFILTRATION = "data_exfiltration"
     PRIVILEGE_ESCALATION = "privilege_escalation"
+    UNEXPECTED_CODE_EXECUTION = "unexpected_code_execution"
 
 
 class ToolCall(BaseModel):
