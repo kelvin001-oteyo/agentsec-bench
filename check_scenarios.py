@@ -18,6 +18,9 @@ from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
 from agentsec_bench.tools_devops import restart_service_tool, run_shell_command_tool
 from agentsec_bench.scenarios_code_execution import UnexpectedCodeExecutionScenario
 
+from agentsec_bench.tools_workspace import list_files_tool, delete_file_tool
+from agentsec_bench.scenarios_rogue import RogueAgentScenario
+
 CHECKS = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
@@ -25,6 +28,7 @@ CHECKS = [
     (CustomerDataExfiltrationScenario(), CRMEnvironment, [lookup_customer_tool, send_message_tool]),
     (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
     (UnexpectedCodeExecutionScenario(), TaskEnvironment, [restart_service_tool, run_shell_command_tool]),
+    (RogueAgentScenario(), TaskEnvironment, [list_files_tool, delete_file_tool]),
 ]
 
 all_passed = True

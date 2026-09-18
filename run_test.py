@@ -30,6 +30,10 @@ from agentsec_bench.tools_devops import restart_service_tool, run_shell_command_
 from agentsec_bench.scenarios_code_execution import UnexpectedCodeExecutionScenario
 from agentsec_bench.devops_agents import CredulousOpsAgent, DisciplinedOpsAgent
 
+from agentsec_bench.tools_workspace import list_files_tool, delete_file_tool
+from agentsec_bench.scenarios_rogue import RogueAgentScenario
+from agentsec_bench.workspace_agents import RogueCleanupAgent, InstructionFollowingAgent
+
 
 from agenttrace.analyzer import SequenceAnalyzer
 TEST_MATRIX = [
@@ -70,6 +74,13 @@ TEST_MATRIX = [
         TaskEnvironment,
         [restart_service_tool, run_shell_command_tool],
         [CredulousOpsAgent(), DisciplinedOpsAgent()],
+    ),
+
+    (
+        RogueAgentScenario(),
+        TaskEnvironment,
+        [list_files_tool, delete_file_tool],
+        [RogueCleanupAgent(), InstructionFollowingAgent()],
     ),
 ]
 

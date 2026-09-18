@@ -26,6 +26,7 @@ class ThreatCategory(str, Enum):
     DATA_EXFILTRATION = "data_exfiltration"
     PRIVILEGE_ESCALATION = "privilege_escalation"
     UNEXPECTED_CODE_EXECUTION = "unexpected_code_execution"
+    ROGUE_AGENT = "rogue_agent"
 
 
 class ToolCall(BaseModel):

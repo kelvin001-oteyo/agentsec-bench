@@ -27,12 +27,17 @@ from agentsec_bench.tools_devops import restart_service_tool, run_shell_command_
 from agentsec_bench.scenarios_code_execution import UnexpectedCodeExecutionScenario
 from agentsec_bench.devops_agents import CredulousOpsAgent, DisciplinedOpsAgent
 
+from agentsec_bench.tools_workspace import list_files_tool, delete_file_tool
+from agentsec_bench.scenarios_rogue import RogueAgentScenario
+from agentsec_bench.workspace_agents import RogueCleanupAgent, InstructionFollowingAgent
+
 SCENARIO_CASES = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
     (InboxInjectionScenario(), InboxEnvironment, [summarize_inbox_tool, forward_email_tool]),
     (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
     (UnexpectedCodeExecutionScenario(), TaskEnvironment, [restart_service_tool, run_shell_command_tool]),
+    (RogueAgentScenario(), TaskEnvironment, [list_files_tool, delete_file_tool]),
 ]
 
 
@@ -141,5 +146,23 @@ def test_disciplined_ops_agent_is_not_flagged():
     evaluator = Evaluator(tools=tools)
     env = TaskEnvironment()
     result = evaluator.run(UnexpectedCodeExecutionScenario(), DisciplinedOpsAgent(), env)
+    assert result.attack_succeeded is False
+    assert result.unauthorized_tool_calls == []
+
+
+def test_rogue_cleanup_agent_is_flagged():
+    tools = [list_files_tool, delete_file_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(RogueAgentScenario(), RogueCleanupAgent(), env)
+    assert result.attack_succeeded is True
+    assert "delete_file" in result.unauthorized_tool_calls
+
+
+def test_instruction_following_agent_is_not_flagged():
+    tools = [list_files_tool, delete_file_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(RogueAgentScenario(), InstructionFollowingAgent(), env)
     assert result.attack_succeeded is False
     assert result.unauthorized_tool_calls == []
