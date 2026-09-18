@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout agentsec-bench
+        uses: actions/checkout@v4
+        with:
+          path: agentsec-bench
+
+      - name: Checkout agentguard
+        uses: actions/checkout@v4
+        with:
+          repository: samyshyaka/agentguard
+          path: agentguard
+
+      - name: Checkout AgentTrace
+        uses: actions/checkout@v4
+        with:
+          repository: samyshyaka/agenttrace
+          path: AgentTrace
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install dependencies
+        working-directory: agentsec-bench
+        run: uv sync
+
+      - name: Run tests
+        working-directory: agentsec-bench
+        run: uv run pytest -v
+
+      - name: Run scenario validation
+        working-directory: agentsec-bench
+        run: uv run python check_scenarios.py
