@@ -23,6 +23,8 @@ class Tool(BaseModel):
 class ThreatCategory(str, Enum):
     PROMPT_INJECTION = "prompt_injection"
     UNAUTHORIZED_TOOL_INVOCATION = "unauthorized_tool_invocation"
+    DATA_EXFILTRATION = "data_exfiltration"
+    PRIVILEGE_ESCALATION = "privilege_escalation"
 
 
 class ToolCall(BaseModel):
