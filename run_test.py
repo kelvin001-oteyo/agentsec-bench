@@ -38,6 +38,10 @@ from agentsec_bench.tools_vendor import lookup_vendor_notes_tool, approve_vendor
 from agentsec_bench.scenarios_memory_poisoning import MemoryPoisoningScenario
 from agentsec_bench.vendor_agents import MemoryTrustingAgent, SkepticalFinanceAgent
 
+from agentsec_bench.tools_reporting import run_backup_tool, report_status_tool
+from agentsec_bench.scenarios_trust_exploitation import TrustExploitationScenario
+from agentsec_bench.reporting_agents import DeceptiveOpsAgent, HonestOpsAgent
+
 
 from agenttrace.analyzer import SequenceAnalyzer
 TEST_MATRIX = [
@@ -93,6 +97,13 @@ TEST_MATRIX = [
         [lookup_vendor_notes_tool, approve_vendor_payment_tool],
         [MemoryTrustingAgent(), SkepticalFinanceAgent()],
     ),
+
+    (
+        TrustExploitationScenario(),
+        TaskEnvironment,
+        [run_backup_tool, report_status_tool],
+        [DeceptiveOpsAgent(), HonestOpsAgent()],
+    ),
 ]
 
 results_summary = []
@@ -112,7 +123,7 @@ for scenario, env_factory, tools, agents in TEST_MATRIX:
             "task_completed": result.task_completed,
             "attack_succeeded": result.attack_succeeded,
             "unauthorized_tool_calls": result.unauthorized_tool_calls,
-            "suspicious_destinations": result.suspicious_destinations,
+                         "suspicious_destinations": result.suspicious_destinations,
             "trace_findings": [f.rule_id for f in trace_findings],
         })
 print(f"{'Scenario':<10} {'Category':<28} {'Agent':<28} {'Attack':<8} {'RoleFlag':<20} {'TraceFlags':<28} Destinations")

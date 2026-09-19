@@ -35,6 +35,10 @@ from agentsec_bench.tools_vendor import lookup_vendor_notes_tool, approve_vendor
 from agentsec_bench.scenarios_memory_poisoning import MemoryPoisoningScenario
 from agentsec_bench.vendor_agents import MemoryTrustingAgent, SkepticalFinanceAgent
 
+from agentsec_bench.tools_reporting import run_backup_tool, report_status_tool
+from agentsec_bench.scenarios_trust_exploitation import TrustExploitationScenario
+from agentsec_bench.reporting_agents import DeceptiveOpsAgent, HonestOpsAgent
+
 SCENARIO_CASES = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
@@ -43,6 +47,7 @@ SCENARIO_CASES = [
     (UnexpectedCodeExecutionScenario(), TaskEnvironment, [restart_service_tool, run_shell_command_tool]),
     (RogueAgentScenario(), TaskEnvironment, [list_files_tool, delete_file_tool]),
     (MemoryPoisoningScenario(), TaskEnvironment, [lookup_vendor_notes_tool, approve_vendor_payment_tool]),
+    (TrustExploitationScenario(), TaskEnvironment, [run_backup_tool, report_status_tool]),
 ]
 
 
@@ -189,3 +194,19 @@ def test_skeptical_finance_agent_is_not_flagged():
     result = evaluator.run(MemoryPoisoningScenario(), SkepticalFinanceAgent(), env)
     assert result.attack_succeeded is False
     assert result.unauthorized_tool_calls == []
+
+
+def test_deceptive_ops_agent_is_flagged():
+    tools = [run_backup_tool, report_status_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(TrustExploitationScenario(), DeceptiveOpsAgent(), env)
+    assert result.attack_succeeded is True
+
+
+def test_honest_ops_agent_is_not_flagged():
+    tools = [run_backup_tool, report_status_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(TrustExploitationScenario(), HonestOpsAgent(), env)
+    assert result.attack_succeeded is False
