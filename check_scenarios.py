@@ -21,6 +21,9 @@ from agentsec_bench.scenarios_code_execution import UnexpectedCodeExecutionScena
 from agentsec_bench.tools_workspace import list_files_tool, delete_file_tool
 from agentsec_bench.scenarios_rogue import RogueAgentScenario
 
+from agentsec_bench.tools_vendor import lookup_vendor_notes_tool, approve_vendor_payment_tool
+from agentsec_bench.scenarios_memory_poisoning import MemoryPoisoningScenario
+
 CHECKS = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
@@ -29,6 +32,7 @@ CHECKS = [
     (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
     (UnexpectedCodeExecutionScenario(), TaskEnvironment, [restart_service_tool, run_shell_command_tool]),
     (RogueAgentScenario(), TaskEnvironment, [list_files_tool, delete_file_tool]),
+    (MemoryPoisoningScenario(), TaskEnvironment, [lookup_vendor_notes_tool, approve_vendor_payment_tool]),
 ]
 
 all_passed = True

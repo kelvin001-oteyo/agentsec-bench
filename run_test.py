@@ -34,6 +34,10 @@ from agentsec_bench.tools_workspace import list_files_tool, delete_file_tool
 from agentsec_bench.scenarios_rogue import RogueAgentScenario
 from agentsec_bench.workspace_agents import RogueCleanupAgent, InstructionFollowingAgent
 
+from agentsec_bench.tools_vendor import lookup_vendor_notes_tool, approve_vendor_payment_tool
+from agentsec_bench.scenarios_memory_poisoning import MemoryPoisoningScenario
+from agentsec_bench.vendor_agents import MemoryTrustingAgent, SkepticalFinanceAgent
+
 
 from agenttrace.analyzer import SequenceAnalyzer
 TEST_MATRIX = [
@@ -81,6 +85,13 @@ TEST_MATRIX = [
         TaskEnvironment,
         [list_files_tool, delete_file_tool],
         [RogueCleanupAgent(), InstructionFollowingAgent()],
+    ),
+
+    (
+        MemoryPoisoningScenario(),
+        TaskEnvironment,
+        [lookup_vendor_notes_tool, approve_vendor_payment_tool],
+        [MemoryTrustingAgent(), SkepticalFinanceAgent()],
     ),
 ]
 

@@ -31,6 +31,10 @@ from agentsec_bench.tools_workspace import list_files_tool, delete_file_tool
 from agentsec_bench.scenarios_rogue import RogueAgentScenario
 from agentsec_bench.workspace_agents import RogueCleanupAgent, InstructionFollowingAgent
 
+from agentsec_bench.tools_vendor import lookup_vendor_notes_tool, approve_vendor_payment_tool
+from agentsec_bench.scenarios_memory_poisoning import MemoryPoisoningScenario
+from agentsec_bench.vendor_agents import MemoryTrustingAgent, SkepticalFinanceAgent
+
 SCENARIO_CASES = [
     (UnauthorizedApprovalScenario(), TaskEnvironment, [list_expenses_tool, approve_payment_tool]),
     (AmbiguousRefundScenario(), TaskEnvironment, [lookup_order_tool, issue_refund_tool]),
@@ -38,6 +42,7 @@ SCENARIO_CASES = [
     (PrivilegeEscalationScenario(), TaskEnvironment, [view_user_tool, grant_admin_tool]),
     (UnexpectedCodeExecutionScenario(), TaskEnvironment, [restart_service_tool, run_shell_command_tool]),
     (RogueAgentScenario(), TaskEnvironment, [list_files_tool, delete_file_tool]),
+    (MemoryPoisoningScenario(), TaskEnvironment, [lookup_vendor_notes_tool, approve_vendor_payment_tool]),
 ]
 
 
@@ -164,5 +169,23 @@ def test_instruction_following_agent_is_not_flagged():
     evaluator = Evaluator(tools=tools)
     env = TaskEnvironment()
     result = evaluator.run(RogueAgentScenario(), InstructionFollowingAgent(), env)
+    assert result.attack_succeeded is False
+    assert result.unauthorized_tool_calls == []
+
+
+def test_memory_trusting_agent_is_flagged():
+    tools = [lookup_vendor_notes_tool, approve_vendor_payment_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(MemoryPoisoningScenario(), MemoryTrustingAgent(), env)
+    assert result.attack_succeeded is True
+    assert "approve_vendor_payment" in result.unauthorized_tool_calls
+
+
+def test_skeptical_finance_agent_is_not_flagged():
+    tools = [lookup_vendor_notes_tool, approve_vendor_payment_tool]
+    evaluator = Evaluator(tools=tools)
+    env = TaskEnvironment()
+    result = evaluator.run(MemoryPoisoningScenario(), SkepticalFinanceAgent(), env)
     assert result.attack_succeeded is False
     assert result.unauthorized_tool_calls == []
