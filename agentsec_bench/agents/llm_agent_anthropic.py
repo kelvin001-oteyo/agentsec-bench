@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
 from anthropic import Anthropic
-from .agent import Agent
-from .types import Tool, ToolCall
+from ..core.agent import Agent
+from ..core.types import Tool, ToolCall
 
 load_dotenv()
 

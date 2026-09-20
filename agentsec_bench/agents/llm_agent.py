@@ -2,8 +2,8 @@ import json
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
-from .agent import Agent
-from .types import Tool, ToolCall
+from ..core.agent import Agent
+from ..core.types import Tool, ToolCall
 
 load_dotenv()
 
