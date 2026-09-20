@@ -4,29 +4,29 @@ across two different threat categories: unauthorized tool invocation
 (role-based) and prompt injection (destination-based).
 """
 
-from agentsec_bench.environment import TaskEnvironment
-from agentsec_bench.environment_inbox import InboxEnvironment
-from agentsec_bench.tools_expense import list_expenses_tool, approve_payment_tool
-from agentsec_bench.tools_inbox import summarize_inbox_tool, forward_email_tool
-from agentsec_bench.scenarios_expense import UnauthorizedApprovalScenario
-from agentsec_bench.scenarios_injection import InboxInjectionScenario
-from agentsec_bench.fake_agent import MisbehavingAgent
-from agentsec_bench.inbox_agents import InjectionSusceptibleAgent
-from agentsec_bench.evaluator import Evaluator
+from agentsec_bench.core.environment import TaskEnvironment
+from agentsec_bench.core.environment_inbox import InboxEnvironment
+from agentsec_bench.tools.tools_expense import list_expenses_tool, approve_payment_tool
+from agentsec_bench.tools.tools_inbox import summarize_inbox_tool, forward_email_tool
+from agentsec_bench.scenarios.scenarios_expense import UnauthorizedApprovalScenario
+from agentsec_bench.scenarios.scenarios_injection import InboxInjectionScenario
+from agentsec_bench.agents.fake_agent import MisbehavingAgent
+from agentsec_bench.agents.inbox_agents import InjectionSusceptibleAgent
+from agentsec_bench.core.evaluator import Evaluator
 
 from agentguard.policy import ToolPolicy
 from agentguard.guard import AgentGuard
 
 
 
-from agentsec_bench.environment_crm import CRMEnvironment
-from agentsec_bench.tools_crm import lookup_customer_tool, send_message_tool
-from agentsec_bench.scenarios_exfiltration import CustomerDataExfiltrationScenario
-from agentsec_bench.crm_agents import ExfiltratingAgent
+from agentsec_bench.core.environment_crm import CRMEnvironment
+from agentsec_bench.tools.tools_crm import lookup_customer_tool, send_message_tool
+from agentsec_bench.scenarios.scenarios_exfiltration import CustomerDataExfiltrationScenario
+from agentsec_bench.agents.crm_agents import ExfiltratingAgent
 
-from agentsec_bench.tools_admin import view_user_tool, grant_admin_tool
-from agentsec_bench.scenarios_privilege import PrivilegeEscalationScenario
-from agentsec_bench.admin_agents import OvereagerAdminAgent
+from agentsec_bench.tools.tools_admin import view_user_tool, grant_admin_tool
+from agentsec_bench.scenarios.scenarios_privilege import PrivilegeEscalationScenario
+from agentsec_bench.agents.admin_agents import OvereagerAdminAgent
 
 
 def demo(label, scenario, tools, agent, env_factory, guard):
