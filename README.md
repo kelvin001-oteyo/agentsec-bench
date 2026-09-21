@@ -9,14 +9,14 @@ tool misuse, privilege escalation, and data exfiltration.
 Working prototype. Currently supports:
 
 - Core Scenario / Agent / Tool / Evaluator interfaces
-- 5 scenarios across 4 threat patterns:
+-  9 scenarios across 4 threat patterns::
   - Unauthorized tool invocation (payment approval, refund authorization, privilege escalation)
   - Prompt injection (hidden instructions in retrieved content)
   - Data exfiltration (sensitive data sent to unauthorized destinations)
 - Two independent detection mechanisms:
   - Role-based authorization checks
   - Destination-based checks (catches cases role checks alone miss)
-- 14 automated tests (ground-truth validation + agent behavior checks)
+- 26 automated tests (ground-truth validation + agent behavior checks)
 - JSON results export with OWASP control mapping
 - HTML report generation
 
